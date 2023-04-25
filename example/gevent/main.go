@@ -1,16 +1,3 @@
-# gevent
-gevent is a network library based on epoll, mainly designed to achieve high-performance network events.
-
-
-# Install
-
-```bash
-go get -u github.com/go-gevent/gevent
-```
-
-# Example
-
-```go
 package main
 
 import (
@@ -65,8 +52,3 @@ func main() {
 	}
 	log.Fatal(gevent.Serve(events, time.Second*10, fmt.Sprintf("%s://:%d?reuseport=%t", scheme, port, reuseport)))
 }
-```
-
-# License
-
-Apache License Version 2.0, http://www.apache.org/licenses/
