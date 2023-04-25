@@ -5,13 +5,12 @@ package gevent
 
 import (
 	"github.com/go-gevent/gevent/internal/utils"
+	"github.com/go-gevent/gevent/ringbuffer"
 	"net"
 	"sync"
 	"sync/atomic"
 	"syscall"
 	"time"
-
-	"github.com/go-gevent/gevent/internal/ringbuffer"
 )
 
 // Conn tcp连接

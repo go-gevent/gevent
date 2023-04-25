@@ -4,11 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/go-gevent/gevent"
+	"github.com/go-gevent/gevent/ringbuffer"
 	"log"
 	"strings"
 	"time"
-
-	"github.com/go-gevent/gevent/internal/ringbuffer"
 )
 
 func main() {

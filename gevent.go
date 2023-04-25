@@ -1,12 +1,11 @@
 package gevent
 
 import (
+	"github.com/go-gevent/gevent/ringbuffer"
 	"net"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/go-gevent/gevent/internal/ringbuffer"
 )
 
 // Action is an action that occurs after the completion of an event.

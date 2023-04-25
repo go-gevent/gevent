@@ -3,6 +3,7 @@ package gevent
 import (
 	"bufio"
 	"fmt"
+	"github.com/go-gevent/gevent/ringbuffer"
 	"io"
 	"math/rand"
 	"net"
@@ -12,8 +13,6 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
-
-	"github.com/go-gevent/gevent/internal/ringbuffer"
 )
 
 func TestServe(t *testing.T) {

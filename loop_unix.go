@@ -5,6 +5,7 @@ package gevent
 
 import (
 	"github.com/go-gevent/gevent/internal/timingwheel"
+	"github.com/go-gevent/gevent/ringbuffer"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -12,7 +13,6 @@ import (
 	"time"
 
 	"github.com/go-gevent/gevent/internal"
-	"github.com/go-gevent/gevent/internal/ringbuffer"
 )
 
 type loop struct {
