@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-gevent/gevent/internal/ringbuffer"
+	"github.com/go-gevent/gevent/ringbuffer"
 )
 
 func main() {
