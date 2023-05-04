@@ -86,8 +86,8 @@ func (p *Poll) Wait(iter func(fd int, note interface{}) error) error {
 }
 
 // ctlEpoll 对 EpollCtl 进行封装，简化调用过程
-func (p *Poll) ctlEpoll(op, fd int, events uint32) {
-	if err := syscall.EpollCtl(p.fd, op, fd, &syscall.EpollEvent{Fd: int32(fd), Events: events}); err != nil {
+func (p *Poll) ctlEpoll(op, fd, events int) {
+	if err := syscall.EpollCtl(p.fd, op, fd, &syscall.EpollEvent{Fd: int32(fd), Events: uint32(events)}); err != nil {
 		panic(err)
 	}
 }
