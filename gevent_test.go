@@ -186,7 +186,7 @@ func testTick(network, addr string) {
 	must(Serve(events, 0, network+"://"+addr))
 
 	dur := time.Since(start)
-	if dur < 250&time.Millisecond || dur > time.Second {
+	if dur < 250*time.Millisecond || dur > time.Second {
 		panic("bad ticker timing")
 	}
 }
