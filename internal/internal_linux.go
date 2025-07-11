@@ -28,7 +28,7 @@ func OpenPoll() *Poll {
 		panic(err)
 	}
 	l.fd = p
-	wfd, err := sysEventfd2(0, 0)
+	wfd, err := sysEventfd2(0, syscall.EFD_NONBLOCK)
 	if err != nil {
 		syscall.Close(p)
 		panic(err)
@@ -49,8 +49,22 @@ func (p *Poll) Close() error {
 // Trigger 添加一个通知到 notes 队列并唤醒 epoll
 func (p *Poll) Trigger(note interface{}) error {
 	p.notes.Add(note)
-	_, err := syscall.Write(p.wfd, []byte{1, 0, 0, 0, 0, 0, 0, 0})
-	return err
+	buf := []byte{1, 0, 0, 0, 0, 0, 0, 0}
+	for {
+		_, err := syscall.Write(p.wfd, buf)
+		if err == nil {
+			break
+		}
+		if err == syscall.EINTR {
+			continue
+		}
+		if err == syscall.EAGAIN || err == syscall.EWOULDBLOCK {
+			// eventfd is full, but that's okay - there's already a pending wakeup
+			break
+		}
+		return err
+	}
+	return nil
 }
 
 // Wait 监听 epoll 事件，并在事件发生时调用迭代器
@@ -63,24 +77,39 @@ func (p *Poll) Wait(iter func(fd int, note interface{}) error) error {
 			return err
 		}
 
+		// Check if we have a wakeup event from eventfd
+		hasWakeup := false
+		for i := 0; i < n; i++ {
+			fd := int(events[i].Fd)
+			if fd == p.wfd {
+				hasWakeup = true
+				break
+			}
+		}
+
+		// If we have a wakeup event, read from eventfd and process notes first
+		if hasWakeup {
+			_, err := syscall.Read(p.wfd, buf)
+			if err != nil && err != syscall.EAGAIN && err != syscall.EWOULDBLOCK {
+				return err
+			}
+			
+			// Process notes immediately after reading eventfd
+			if err := p.notes.ForEach(func(note interface{}) error {
+				return iter(0, note)
+			}); err != nil {
+				return err
+			}
+		}
+
+		// Process regular epoll events
 		for i := 0; i < n; i++ {
 			fd := int(events[i].Fd)
 			if fd != p.wfd {
 				if err := iter(fd, nil); err != nil {
 					return err
 				}
-			} else {
-				_, err := syscall.Read(p.wfd, buf)
-				if err != nil && err != syscall.EAGAIN && err != syscall.EWOULDBLOCK {
-					panic(err)
-				}
 			}
-		}
-
-		if err := p.notes.ForEach(func(note interface{}) error {
-			return iter(0, note)
-		}); err != nil {
-			return err
 		}
 	}
 }
